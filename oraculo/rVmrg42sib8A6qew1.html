@@ -1,0 +1,557 @@
+<html><head><base href="https://divination-oracle.web/?">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oráculo Místico</title>
+<style>
+  body, html {
+    font-family: 'Cormorant Garamond', serif;
+    background-color: #0a0a1a;
+    color: #e0e0ff;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+  h1 {
+    text-align: center;
+    font-size: 2.5em;
+    margin-top: 20px;
+    color: #a0a0ff;
+    text-shadow: 0 0 10px rgba(160, 160, 255, 0.7);
+  }
+  .window-container {
+    display: flex;
+    height: calc(100vh - 100px);
+  }
+  .window {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    transition: all 0.5s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .window:not(:last-child) {
+    border-right: 1px solid #4040a0;
+  }
+  .window.active {
+    flex: 3;
+  }
+  .window:not(.active) {
+    flex: 0.2;
+  }
+  .content {
+    background-color: rgba(20, 20, 40, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(100, 100, 255, 0.2);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .window.active .content {
+    opacity: 1;
+  }
+  .window-title {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    text-align: right;
+    color: #a0a0ff;
+    text-shadow: 0 0 5px rgba(160, 160, 255, 0.5);
+    transition: all 0.5s ease;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+  }
+  .window.active .window-title {
+    writing-mode: horizontal-tb;
+    transform: none;
+    bottom: auto;
+    top: 20px;
+  }
+  .window:not(.active) .window-title {
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0% { transform: rotate(180deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.05); }
+    100% { transform: rotate(180deg) scale(1); }
+  }
+  input, button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #4040a0;
+    background-color: rgba(30, 30, 60, 0.6);
+    color: #e0e0ff;
+    font-family: inherit;
+  }
+  button {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #4040a0;
+  }
+  button:hover {
+    background-color: #5050b0;
+    box-shadow: 0 0 10px rgba(160, 160, 255, 0.5);
+  }
+  #crystalBall {
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle at 30% 30%, #a0a0ff, #4040a0);
+    border-radius: 50%;
+    margin: 20px auto;
+    box-shadow: 0 0 20px rgba(160, 160, 255, 0.5);
+    transition: all 0.5s ease;
+    position: relative;
+    animation: pulse 2s infinite alternate;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+  }
+  .moving-star {
+    position: absolute;
+    top: 0;
+    left: 0;
+    fill: #8a2be2;
+  }
+  .star-1 {
+    animation: moveStar1 5s infinite linear, changeColor 4s infinite alternate;
+  }
+  .star-2 {
+    animation: moveStar2 7s infinite linear, changeColor 5s infinite alternate;
+  }
+  .star-3 {
+    animation: moveStar3 6s infinite linear, changeColor 4.5s infinite alternate;
+  }
+  .star-4 {
+    animation: moveStar4 8s infinite linear, changeColor 5.5s infinite alternate;
+  }
+  .star-5 {
+    animation: moveStar5 9s infinite linear, changeColor 6s infinite alternate;
+  }
+  @keyframes moveStar1 {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(136px, 0) rotate(90deg); }
+    50% { transform: translate(136px, 136px) rotate(180deg); }
+    75% { transform: translate(0, 136px) rotate(270deg); }
+    100% { transform: translate(0, 0) rotate(360deg); }
+  }
+  @keyframes moveStar2 {
+    0% { transform: translate(40px, 40px) rotate(0deg); }
+    25% { transform: translate(120px, 40px) rotate(90deg); }
+    50% { transform: translate(120px, 120px) rotate(180deg); }
+    75% { transform: translate(40px, 120px) rotate(270deg); }
+    100% { transform: translate(40px, 40px) rotate(360deg); }
+  }
+  @keyframes moveStar3 {
+    0% { transform: translate(80px, 20px) rotate(0deg); }
+    25% { transform: translate(140px, 80px) rotate(90deg); }
+    50% { transform: translate(80px, 140px) rotate(180deg); }
+    75% { transform: translate(20px, 80px) rotate(270deg); }
+    100% { transform: translate(80px, 20px) rotate(360deg); }
+  }
+  @keyframes moveStar4 {
+    0% { transform: translate(20px, 100px) rotate(0deg); }
+    25% { transform: translate(100px, 20px) rotate(90deg); }
+    50% { transform: translate(180px, 100px) rotate(180deg); }
+    75% { transform: translate(100px, 180px) rotate(270deg); }
+    100% { transform: translate(20px, 100px) rotate(360deg); }
+  }
+  @keyframes moveStar5 {
+    0% { transform: translate(60px, 60px) rotate(0deg); }
+    25% { transform: translate(140px, 60px) rotate(90deg); }
+    50% { transform: translate(140px, 140px) rotate(180deg); }
+    75% { transform: translate(60px, 140px) rotate(270deg); }
+    100% { transform: translate(60px, 60px) rotate(360deg); }
+  }
+  @keyframes changeColor {
+    0% { fill: #8a2be2; }
+    50% { fill: #9400d3; }
+    100% { fill: #9932cc; }
+  }
+  .prediction, #dailyAdvice, #personalizedPrediction {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(40, 40, 80, 0.6);
+    border-radius: 10px;
+    text-align: center;
+  }
+  #predictionHistory {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+  }
+  #predictionHistory li {
+    background-color: rgba(40, 40, 80, 0.4);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  #predictionHistory li strong {
+    color: #a0a0ff;
+  }
+  .glow {
+    animation: glow 0.5s ease-in-out;
+  }
+  @keyframes glow {
+    0% { box-shadow: 0 0 5px rgba(160, 160, 255, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(160, 160, 255, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(160, 160, 255, 0.5); }
+  }
+  #favicon {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 32px;
+    height: 32px;
+  }
+  .audio-button {
+    background-color: #4040a0;
+    color: #e0e0ff;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+  }
+  .audio-button:hover {
+    background-color: #5050b0;
+    box-shadow: 0 0 10px rgba(160, 160, 255, 0.5);
+  }
+  .social-buttons {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+  }
+  .social-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #4040a0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+  }
+  .social-button:hover {
+    background-color: #5050b0;
+    transform: scale(1.1);
+  }
+  .social-button svg {
+    width: 20px;
+    height: 20px;
+    fill: #e0e0ff;
+  }
+</style>
+</head>
+<body>
+  <h1>Oráculo Místico</h1>
+  <svg style="display: none;">
+    <symbol id="star" viewBox="0 0 24 24">
+      <path d="M12 0 L15 8 L24 8 L18 13 L20 21 L12 17 L4 21 L6 13 L0 8 L9 8 Z" />
+    </symbol>
+    <symbol id="donation" viewBox="0 0 24 24">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </symbol>
+  </svg>
+  <svg id="favicon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="16" r="14" fill="#0a0a1a" stroke="#a0a0ff" stroke-width="2"/>
+    <path d="M16 6 L20 14 L28 14 L22 20 L24 28 L16 24 L8 28 L10 20 L4 14 L12 14 Z" fill="#a0a0ff"/>
+  </svg>
+  
+  <div class="social-buttons">
+    <a href="https://t.me/oraculo_mistico" target="_blank" class="social-button" aria-label="Telegram">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.247l-2.17 10.223c-.163.772-.617.955-1.25.595l-3.45-2.543-1.666 1.604c-.185.185-.34.34-.69.34l.246-3.49 6.35-5.74c.275-.248-.06-.386-.43-.138l-7.84 4.938-3.38-1.058c-.735-.23-.75-.735.155-1.088l13.19-5.084c.612-.23 1.145.136.935 1.086z"/>
+      </svg>
+    </a>
+    <a href="https://twitter.com/oraculo_mistico" target="_blank" class="social-button" aria-label="Twitter">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M23.954 4.569c-.885.389-1.83.654-2.825.775 1.014-.611 1.794-1.574 2.163-2.723-.951.555-2.005.959-3.127 1.184-.896-.959-2.173-1.559-3.591-1.559-2.717 0-4.92 2.203-4.92 4.917 0 .39.045.765.127 1.124C7.691 8.094 4.066 6.13 1.64 3.161c-.427.722-.666 1.561-.666 2.475 0 1.71.87 3.213 2.188 4.096-.807-.026-1.566-.248-2.228-.616v.061c0 2.385 1.693 4.374 3.946 4.827-.413.111-.849.171-1.296.171-.314 0-.615-.03-.916-.086.631 1.953 2.445 3.377 4.604 3.417-1.68 1.319-3.809 2.105-6.102 2.105-.39 0-.779-.023-1.17-.067 2.189 1.394 4.768 2.209 7.557 2.209 9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63.961-.689 1.8-1.56 2.46-2.548l-.047-.02z"/>
+      </svg>
+    </a>
+    <a href="https://example.com/donate" target="_blank" class="social-button" aria-label="Donar">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <use href="#donation" />
+      </svg>
+    </a>
+  </div>
+
+  <div class="window-container">
+    <div class="window active" id="predictionWindow">
+      <div class="window-title">Predicción del Destino</div>
+      <div class="content">
+        <form id="predictionForm">
+          <input type="text" id="question" placeholder="Haz tu pregunta al oráculo..." required>
+          <button type="submit">Consultar al Oráculo</button>
+        </form>
+        <div id="crystalBall">
+          <svg class="moving-star star-1" width="64" height="64">
+            <use href="#star" />
+          </svg>
+          <svg class="moving-star star-2" width="48" height="48">
+            <use href="#star" />
+          </svg>
+          <svg class="moving-star star-3" width="40" height="40">
+            <use href="#star" />
+          </svg>
+          <svg class="moving-star star-4" width="32" height="32">
+            <use href="#star" />
+          </svg>
+          <svg class="moving-star star-5" width="24" height="24">
+            <use href="#star" />
+          </svg>
+        </div>
+        <div id="prediction" class="prediction"></div>
+        <button class="audio-button" onclick="readText('prediction')">🔊</button>
+        
+        <h3>Historial de Predicciones</h3>
+        <ul id="predictionHistory"></ul>
+      </div>
+    </div>
+    
+    <div class="window" id="adviceWindow">
+      <div class="window-title">Consejo del Día</div>
+      <div class="content">
+        <button id="adviceButton">Recibir Consejo</button>
+        <div id="dailyAdvice"></div>
+        <button class="audio-button" onclick="readText('dailyAdvice')">🔊</button>
+      </div>
+    </div>
+    
+    <div class="window" id="personalizedWindow">
+      <div class="window-title">Predicción Personalizada</div>
+      <div class="content">
+        <form id="personalizedForm">
+          <input type="text" id="name" placeholder="Tu nombre" required>
+          <input type="date" id="birthdate" required>
+          <button type="submit">Obtener Predicción Personalizada</button>
+        </form>
+        <div id="personalizedPrediction"></div>
+        <button class="audio-button" onclick="readText('personalizedPrediction')">🔊</button>
+      </div>
+    </div>
+    
+    <div class="window" id="yesNoWindow">
+      <div class="window-title">Respuesta Sí o No</div>
+      <div class="content">
+        <form id="yesNoForm">
+          <input type="text" id="yesNoQuestion" placeholder="Haz una pregunta de sí o no..." required>
+          <button type="submit">Obtener Respuesta</button>
+        </form>
+        <div id="yesNoResponse" class="prediction"></div>
+        <button class="audio-button" onclick="readText('yesNoResponse')">🔊</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const predictions = [
+      "En los próximos días, encontrarás una oportunidad inesperada que cambiará tu perspectiva sobre [tema]. Mantén los ojos abiertos y confía en tu intuición para reconocerla. Las estrellas sugieren que esta oportunidad se presentará de una manera sutil, quizás en un lugar que frequentes pero nunca has notado realmente.",
+      "Tu persistencia en [área] finalmente dará frutos. Espera un avance significativo en las próximas dos semanas que recompensará tus esfuerzos. Un encuentro fortuito con alguien del pasado podría ser el catalizador de este cambio positivo.",
+      "Una persona del pasado volverá a tu vida, trayendo consigo una lección importante sobre [tema]. Esta interacción te ayudará a cerrar un capítulo inconcluso y abrirá las puertas a un nuevo ciclo de crecimiento personal. Presta atención a los sueños recurrentes, pues podrían contener pistas sobre esta reunión.",
+      "Tu creatividad está a punto de alcanzar nuevas alturas. Un proyecto que has estado posponiendo resultará ser más exitoso de lo que imaginas, especialmente si lo inicias antes de que termine el mes. La luna llena próxima amplificará tu energía creativa, aprovecha este momento cósmico.",
+      "Un desafío que enfrentarás pronto en [área] te obligará a salir de tu zona de confort. Aunque puede parecer intimidante al principio, superarlo te llevará a un crecimiento personal significativo. Una figura misteriosa aparecerá para guiarte, presta atención a sus sutiles señales.",
+      "Las estrellas indican un período de introspección necesaria. Dedica tiempo a la reflexión sobre [tema], ya que las respuestas que buscas están dentro de ti. Un objeto olvidado de tu pasado resurgirá, trayendo consigo recuerdos y revelaciones importantes.",
+      "Una decisión que tomarás en los próximos días tendrá un impacto duradero en tu [área de vida]. Confía en tu juicio, pero también busca el consejo de alguien en quien confíes. Los números 3, 7 y 9 tendrán un significado especial en este proceso, mantente alerta a su aparición.",
+      "Se avecina un período de cambio en tu [área]. Aunque puede parecer desafiante al principio, estos cambios allanarán el camino para nuevas y emocionantes oportunidades. Un animal inusual cruzará tu camino, su presencia será un presagio de la transformación por venir.",
+      "Tu intuición estará excepcionalmente aguda en las próximas semanas. Presta atención a tus corazonadas, especialmente en asuntos relacionados con [tema], ya que te guiarán en la dirección correcta. Un sueño recurrente contendrá la clave para descifrar un misterio personal.",
+      "Un encuentro casual con alguien nuevo traerá una perspectiva fresca a tu vida. Esta persona podría convertirse en un aliado importante en tu viaje hacia [meta u objetivo]. La sincronicidad jugará un papel crucial en este encuentro, mantén tus sentidos alerta a las coincidencias significativas."
+    ];
+
+    const advice = {
+      "Sabiduría Interior": [
+        "Escucha el susurro de tu alma; en el silencio de la introspección, encontrarás las respuestas que buscas en el exterior.",
+        "Cada desafío es un maestro disfrazado. Abraza las lecciones que la vida te ofrece, pues en ellas reside la semilla de tu crecimiento.",
+        "Tu verdadero poder yace en la aceptación de tu ser completo. Abraza tus sombras, pues son el crisol de tu luz interior.",
+        "El camino hacia la iluminación está pavimentado con momentos de duda. Cuestiona, pero no te detengas; la verdad se revela a quienes perseveran.",
+        "En el jardín de tu mente, cultiva pensamientos de amor y compasión. Estos son los frutos que nutrirán tu espíritu en tiempos de escasez."
+      ],
+      "Conexión Universal": [
+        "Eres una nota en la sinfonía cósmica. Vibra con tu frecuencia única y contribuirás a la armonía universal.",
+        "Cada acción, por pequeña que sea, crea ondas en el océano de la existencia. Actúa con intención y conciencia.",
+        "En la red de la vida, cada hilo es sagrado. Honra tus conexiones, pues en ellas se refleja la totalidad del universo.",
+        "El universo habla en el lenguaje de las sincronicidades. Afina tu percepción y descubrirás mensajes en lo aparentemente mundano.",
+        "Eres tanto el observador como lo observado. En esta danza cósmica, tu conciencia da forma a la realidad que percibes."
+      ],
+      "Transformación Personal": [
+        "La metamorfosis del espíritu no conoce límites de tiempo. Sé paciente con tu evolución; cada momento es una oportunidad para renacer.",
+        "En el fuego de la adversidad, forja el acero de tu carácter. Las pruebas de hoy son el temple de tu fuerza futura.",
+        "Desapégate de las expectativas y fluye con el río de la vida. En la rendición encontrarás una libertad que trasciende el entendimiento.",
+        "Cada elección es una semilla de destino. Planta con sabiduría y cultiva con amor; tu futuro florecerá acorde.",
+        "El verdadero cambio comienza en el microcosmos de tu ser. Transforma tu mundo interior y el exterior se alineará en armonía."
+      ],
+      "Equilibrio y Armonía": [
+        "En el balance entre luz y oscuridad reside tu totalidad. Abraza ambos aspectos para alcanzar la plenitud de tu ser.",
+        "Como el yin y el yang, busca la complementariedad en todas las cosas. En la aparente contradicción yace la verdad más profunda.",
+        "Sincroniza tu ritmo interno con los ciclos de la naturaleza. En esta danza cósmica, encontrarás tu lugar en el gran tapiz de la existencia.",
+        "La paz no es la ausencia de tormenta, sino la calma en su centro. Cultiva tu serenidad interior y serás inamovible ante los vientos del cambio.",
+        "En el equilibrio entre dar y recibir se encuentra el flujo natural de la abundancia. Sé un canal abierto para la energía universal."
+      ]
+    };
+
+    function getPrediction(question) {
+      const keywords = {
+        amor: ["amor", "relación", "pareja", "romance", "corazón"],
+        trabajo: ["trabajo", "carrera", "profesión", "negocio", "empleo"],
+        salud: ["salud", "bienestar", "enfermedad", "cuerpo", "mente"],
+        dinero: ["dinero", "finanzas", "economía", "riqueza", "abundancia"],
+        familia: ["familia", "hogar", "padres", "hijos", "parientes"]
+      };
+
+      let category = "general";
+      for (const [key, words] of Object.entries(keywords)) {
+        if (words.some(word => question.toLowerCase().includes(word))) {
+          category = key;
+          break;
+        }
+      }
+
+      let prediction = predictions[Math.floor(Math.random() * predictions.length)];
+      prediction = prediction.replace(/\[tema\]/g, category);
+      prediction = prediction.replace(/\[área\]/g, category);
+      prediction = prediction.replace(/\[área de vida\]/g, category);
+      prediction = prediction.replace(/\[meta u objetivo\]/g, `tu búsqueda en ${category}`);
+
+      return prediction;
+    }
+
+    let predictionHistory = [];
+
+    document.getElementById('predictionForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const crystalBall = document.getElementById('crystalBall');
+      const predictionDiv = document.getElementById('prediction');
+      const question = document.getElementById('question').value;
+      
+      crystalBall.classList.add('rotating');
+      predictionDiv.textContent = 'Consultando al oráculo...';
+      
+      setTimeout(() => {
+        const prediction = getPrediction(question);
+        crystalBall.classList.remove('rotating');
+        predictionDiv.textContent = prediction;
+        
+        predictionHistory.unshift({ question, prediction });
+        if (predictionHistory.length > 5) predictionHistory.pop();
+        
+        updatePredictionHistory();
+      }, 2000);
+    });
+
+    function updatePredictionHistory() {
+      const historyList = document.getElementById('predictionHistory');
+      historyList.innerHTML = '';
+      predictionHistory.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${item.question}</strong>: ${item.prediction}`;
+        historyList.appendChild(li);
+      });
+    }
+
+    document.getElementById('adviceButton').addEventListener('click', function() {
+      const adviceDiv = document.getElementById('dailyAdvice');
+      const categories = Object.keys(advice);
+      const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+      const randomAdvice = advice[randomCategory][Math.floor(Math.random() * advice[randomCategory].length)];
+      
+      this.classList.add('glow');
+      setTimeout(() => this.classList.remove('glow'), 500);
+      
+      adviceDiv.innerHTML = `<strong>${randomCategory}:</strong> ${randomAdvice}`;
+    });
+
+    document.getElementById('personalizedForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const birthdate = new Date(document.getElementById('birthdate').value);
+      const predictionDiv = document.getElementById('personalizedPrediction');
+      
+      const zodiacSigns = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"];
+      const zodiacSign = zodiacSigns[Math.floor((birthdate.getMonth() + 1) % 12)];
+      
+      const personalizedPredictions = [
+        `${name}, como ${zodiacSign}, tu camino está iluminado por estrellas de oportunidad. Una constelación única se forma en tu carta astral, sugiriendo un período de descubrimientos profundos y crecimiento espiritual.`,
+        `Las energías cósmicas favorecen tu crecimiento personal, ${name}. El planeta regente de ${zodiacSign} está entrando en una fase poderosa, amplificando tu intuición y capacidad de manifestación.`,
+        `${name}, tu signo ${zodiacSign} te guía hacia un futuro prometedor. Un portal energético se está abriendo en tu camino, ofreciendo la posibilidad de transcender viejos patrones y abrazar una nueva versión de ti mismo.`,
+        `Grandes cambios se avecinan en tu horizonte, ${name}. La danza cósmica de los planetas alrededor de tu signo ${zodiacSign} sugiere una transformación profunda en tu percepción de la realidad.`,
+        `${name}, tu intuición ${zodiacSign} será tu mejor guía en los próximos días. Un mensaje importante se revelará a través de símbolos y sincronicidades; mantén tu mente abierta a las señales sutiles del universo.`
+      ];
+      
+      const randomPrediction = personalizedPredictions[Math.floor(Math.random() * personalizedPredictions.length)];
+      predictionDiv.textContent = randomPrediction;
+    });
+
+    document.getElementById('yesNoForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const question = document.getElementById('yesNoQuestion').value;
+      const responseDiv = document.getElementById('yesNoResponse');
+      
+      responseDiv.textContent = 'Consultando al oráculo...';
+      
+      setTimeout(() => {
+        const response = getYesNoResponse(question);
+        responseDiv.textContent = response;
+      }, 1500);
+    });
+
+    function getYesNoResponse(question) {
+      const responses = ['Sí', 'No', 'Tal vez'];
+      const randomIndex = Math.floor(Math.random() * responses.length);
+      
+      const maybeKeywords = ['posible', 'quizás', 'probablemente', 'chance', 'oportunidad'];
+      
+      const containsMaybeKeyword = maybeKeywords.some(keyword => question.toLowerCase().includes(keyword));
+      
+      if (containsMaybeKeyword && Math.random() < 0.7) {
+        return 'Tal vez. ' + getAdditionalComment();
+      }
+      
+      const response = responses[randomIndex];
+      return response + '. ' + getAdditionalComment();
+    }
+
+    function getAdditionalComment() {
+      const comments = [
+        'El futuro es un tapiz tejido con hilos de posibilidades. Esta respuesta es solo uno de esos hilos.',
+        'Los antiguos oráculos hablaban en acertijos por una razón. Reflexiona profundamente sobre el significado detrás de esta respuesta.',
+        'Recuerda, incluso el destino más fijo puede ser alterado por el poder de la voluntad y la intención.',
+        'Las estrellas sugieren este camino, pero el libre albedrío siempre juega un papel en el gran misterio de la vida.',
+        'En el gran libro del destino, esta página aún está siendo escrita. Tú tienes el poder de influir en la narrativa.',
+        'Los susurros del universo son sutiles. Esta respuesta es una guía, pero la verdadera sabiduría yace en tu interpretación.',
+        'Como la luna influye en las mareas, esta respuesta puede influir en tu camino. Sin embargo, tú eres el navegante de tu propio destino.',
+        'En el jardín de las posibilidades, esta respuesta es solo una flor. Explora el jardín completo antes de tomar tu decisión.',
+        'El péndulo del destino oscila constantemente. Esta respuesta refleja su posición actual, pero el movimiento es eterno.',
+        'Los antiguos místicos creían que cada pregunta contenía su propia respuesta. Busca la verdad tanto en la pregunta como en esta respuesta.'
+      ];
+      
+      return comments[Math.floor(Math.random() * comments.length)];
+    }
+
+    function readText(elementId) {
+      const text = document.getElementById(elementId).textContent;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'es-ES';
+      window.speechSynthesis.speak(utterance);
+    }
+
+    document.querySelectorAll('.window').forEach(window => {
+      window.addEventListener('click', function() {
+        document.querySelectorAll('.window').forEach(w => w.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
